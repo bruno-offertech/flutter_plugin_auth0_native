@@ -178,6 +178,27 @@ class Auth0Native {
     });
   }
 
+  Future<Map<String, dynamic>> loginWithEmailAndPassword(
+    String email,
+    String password, {
+    String connection,
+    String audience,
+    String scope,
+    String device,
+    Map<String, dynamic> parameters,
+  }) async {
+    return await _methodChannel
+        .invokeMapMethod<String, dynamic>('loginWithEmail', {
+      'email': email,
+      'password': password,
+      'connection': connection,
+      'audience': audience,
+      'scope': scope,
+      'device': device,
+      'parameters': parameters,
+    });
+  }
+
   /// Attempts a native login via Sign in With Apple. (iOS only).
   Future<Map<String, dynamic>> signInWithApple({
     String audience,

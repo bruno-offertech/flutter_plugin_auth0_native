@@ -252,27 +252,45 @@ public class SwiftAuth0NativePlugin: NSObject, FlutterPlugin {
             return
         }
         
-        guard let email = map["email"] as? String,
-            let code = map["code"] as? String else {
-                result(FlutterError(code: "invalid-params", message: nil, details: nil))
-                return
+        let email = map["email"] as! String;
+        let code = map["code"] as? String;
+        let password = map["password"] as? String;
+        
+        if (code == nil && password == nil) {
+            result(FlutterError(code: "invalid-params", message: nil, details: nil))
+            return
         }
         
         let audience = map["audience"] as? String
         let scope = map["scope"] as? String
         let parameters = map["scope"] as? [String:Any] ?? [:]
         
-        Auth0.authentication()
-            .logging(enabled: self.loggingEnabled)
-            .login(email: email, code: code, audience: audience, scope: scope, parameters: parameters)
-            .start { (auth0Result) in
-                switch auth0Result {
-                case .success(result: let credentials):
-                    self.credentialsManager?.store(credentials: credentials)
-                    result(mapCredentials(credentials))
-                case .failure(error: let error):
-                    result(mapError(error))
-                }
+        if(code != nil) {
+            Auth0.authentication()
+                .logging(enabled: self.loggingEnabled)
+                .login(email: email, code: code!, audience: audience, scope: scope, parameters: parameters)
+                .start { (auth0Result) in
+                    switch auth0Result {
+                    case .success(result: let credentials):
+                        self.credentialsManager?.store(credentials: credentials)
+                        result(mapCredentials(credentials))
+                    case .failure(error: let error):
+                        result(mapError(error))
+                    }
+            }
+        } else {
+            Auth0.authentication()
+                .logging(enabled: self.loggingEnabled)
+                .login(usernameOrEmail: email, password: password!, realm: "password", audience: audience, scope: scope, parameters: parameters)
+                .start { (auth0Result) in
+                    switch auth0Result {
+                    case .success(result: let credentials):
+                        self.credentialsManager?.store(credentials: credentials)
+                        result(mapCredentials(credentials))
+                    case .failure(error: let error):
+                        result(mapError(error))
+                    }
+            }
         }
     }
     

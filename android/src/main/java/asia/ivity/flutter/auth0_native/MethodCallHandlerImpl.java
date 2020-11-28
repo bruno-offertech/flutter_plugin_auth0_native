@@ -310,9 +310,16 @@ public class MethodCallHandlerImpl implements MethodCallHandler {
   private void handleLoginWithEmail(MethodCall call, final Result result) {
     final String email = call.argument("email");
     final String code = call.argument("code");
+    final String password = call.argument("password");
     final String connection = call.argument("connection");
 
-    AuthenticationRequest request = apiClient.loginWithEmail(email, code, connection);
+    AuthenticationRequest request;
+
+    if(code != null){
+      request = apiClient.loginWithEmail(email, code, connection);
+    } else {
+      request = apiClient.login(email, password);
+    }
 
     final String audience = call.argument("audience");
     if (audience != null) {
