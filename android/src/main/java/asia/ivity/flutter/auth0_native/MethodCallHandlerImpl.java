@@ -12,6 +12,7 @@ import com.auth0.android.Auth0Exception;
 import com.auth0.android.authentication.AuthenticationAPIClient;
 import com.auth0.android.authentication.AuthenticationException;
 import com.auth0.android.authentication.PasswordlessType;
+import com.auth0.android.authentication.request.DatabaseConnectionRequest;
 import com.auth0.android.authentication.storage.CredentialsManagerException;
 import com.auth0.android.authentication.storage.SecureCredentialsManager;
 import com.auth0.android.authentication.storage.SharedPreferencesStorage;
@@ -24,6 +25,8 @@ import com.auth0.android.provider.WebAuthProvider.LogoutBuilder;
 import com.auth0.android.request.AuthenticationRequest;
 import com.auth0.android.request.ParameterizableRequest;
 import com.auth0.android.result.Credentials;
+import com.auth0.android.result.DatabaseUser;
+
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
@@ -80,6 +83,9 @@ public class MethodCallHandlerImpl implements MethodCallHandler {
         break;
       case "loginWithEmail":
         handleLoginWithEmail(call, result);
+        break;
+      case "signUpWithEmailAndPassword":
+        handleSignUpWithWithEmailAndPassword(call, result);
         break;
       default:
         result.notImplemented();
@@ -318,7 +324,7 @@ public class MethodCallHandlerImpl implements MethodCallHandler {
     if(code != null){
       request = apiClient.loginWithEmail(email, code, connection);
     } else {
-      request = apiClient.login(email, password);
+      request = apiClient.login(email, password, "Username-Password-Authentication");
     }
 
     final String audience = call.argument("audience");
@@ -345,6 +351,27 @@ public class MethodCallHandlerImpl implements MethodCallHandler {
             credentialsManager.saveCredentials(payload);
 
             mainThreadHandler.post(() -> result.success(Mappers.mapCredentials(payload)));
+          }
+
+          @Override
+          public void onFailure(AuthenticationException error) {
+            mainThreadHandler.post(() -> result.error("failed-exception", error.getMessage(), ""));
+          }
+        });
+  }
+
+  private void handleSignUpWithWithEmailAndPassword(MethodCall call, final Result result) {
+    final String email = call.argument("email");
+    final String password = call.argument("password");
+    // final String connection = call.argument("connection");
+
+    DatabaseConnectionRequest<DatabaseUser, AuthenticationException> request =  apiClient.createUser(email, password, "Username-Password-Authentication");
+
+    request.start(
+        new BaseCallback<DatabaseUser, AuthenticationException>() {
+          @Override
+          public void onSuccess(DatabaseUser payload) {
+              handleLoginWithEmail(call, result);
           }
 
           @Override

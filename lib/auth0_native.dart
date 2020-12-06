@@ -210,6 +210,27 @@ class Auth0Native {
       'scope': scope,
     });
   }
+
+  Future<Map<String, dynamic>> signUpWithEmailAndPassword(
+    String email,
+    String password, {
+    String connection,
+    String audience,
+    String scope,
+    String device,
+    Map<String, dynamic> parameters,
+  }) async {
+    return await _methodChannel
+        .invokeMapMethod<String, dynamic>('signUpWithEmailAndPassword', {
+      'email': email,
+      'password': password,
+      'connection': connection,
+      'audience': audience,
+      'scope': scope,
+      'device': device,
+      'parameters': parameters,
+    });
+  }
 }
 
 String _mapPasswordlessType(PasswordlessType type) {

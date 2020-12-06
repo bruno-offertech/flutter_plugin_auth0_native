@@ -48,6 +48,9 @@ public class SwiftAuth0NativePlugin: NSObject, FlutterPlugin {
         case "loginWithEmail":
             handleLoginWithEmail(call, result)
             break
+        case "signUpWithEmailAndPassword":
+            handleSignUpWithEmailAndPassword(call, result)
+            break
         case "signInWithApple":
             if #available(iOS 13.0, *) {
                 handleSignInWithApple(call, result)
@@ -281,7 +284,7 @@ public class SwiftAuth0NativePlugin: NSObject, FlutterPlugin {
         } else {
             Auth0.authentication()
                 .logging(enabled: self.loggingEnabled)
-                .login(usernameOrEmail: email, password: password!, realm: "password", audience: audience, scope: scope, parameters: parameters)
+                .login(usernameOrEmail: email, password: password!, realm: "Username-Password-Authentication", audience: audience, scope: scope, parameters: parameters)
                 .start { (auth0Result) in
                     switch auth0Result {
                     case .success(result: let credentials):
@@ -291,6 +294,37 @@ public class SwiftAuth0NativePlugin: NSObject, FlutterPlugin {
                         result(mapError(error))
                     }
             }
+        }
+    }
+    
+    private func handleSignUpWithEmailAndPassword(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
+        guard let map: [String: Any] = call.arguments as? [String:Any] else {
+            result(FlutterError(code: "invalid-params", message: nil, details: nil))
+            return
+        }
+        
+        let email = map["email"] as! String;
+        let password = map["password"] as! String;
+        
+//        if (email == nil || password == nil) {
+//            result(FlutterError(code: "invalid-params", message: nil, details: nil))
+//            return
+//        }
+        
+//        let audience = map["audience"] as? String
+//        let scope = map["scope"] as? String
+//        let parameters = map["scope"] as? [String:Any] ?? [:]
+        
+        Auth0.authentication()
+            .logging(enabled: self.loggingEnabled)
+            .createUser(email: email, password: password, connection: "Username-Password-Authentication")
+            .start { (auth0Result) in
+                switch auth0Result {
+                case .success(result: let databaseUser):
+                    self.handleLoginWithEmail(call, result)
+                case .failure(error: let error):
+                    result(mapError(error))
+                }
         }
     }
     
