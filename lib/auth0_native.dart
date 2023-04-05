@@ -15,7 +15,7 @@ enum PasswordlessType {
 /// The class uses the native Auth0 SDKs under the hood. Refer to the detailed
 /// documentation at https://www.auth0.com for details.
 class Auth0Native {
-  static Auth0Native _instance;
+  static Auth0Native? _instance;
 
   /// Default constructor which initializes or returns a singleton instance.
   ///
@@ -40,16 +40,16 @@ class Auth0Native {
   final MethodChannel _methodChannel;
 
   /// Retrieve the current login credentials.
-  Future<Map<String, dynamic>> get currentCredentials {
+  Future<Map<String, dynamic>?> get currentCredentials {
     return _methodChannel.invokeMapMethod<String, dynamic>('getCredentials');
   }
 
   /// Observe the credentials as they pass through the system.
-  final Stream<Map<String, dynamic>> observeCredentials;
+  final Stream<Map<String, dynamic>?> observeCredentials;
 
   /// Utility method which informs whether credentials are available (e.g. the
   /// user has logged in).
-  Future<bool> hasCredentials() async {
+  Future<bool?> hasCredentials() async {
     return await _methodChannel.invokeMethod<bool>('hasCredentials');
   }
 
@@ -69,14 +69,14 @@ class Auth0Native {
   }
 
   /// Starts web auth login with the specified parameters.
-  Future<Map<String, dynamic>> login({
-    String audience,
-    String scheme,
+  Future<Map<String, dynamic>?> login({
+    String? audience,
+    String? scheme,
 
     /// Will default to `null` which shows the login page.
-    String connection,
-    String scope,
-    Map<String, String> parameters,
+    String? connection,
+    String? scope,
+    Map<String, String>? parameters,
   }) async {
     return await _methodChannel.invokeMapMethod<String, dynamic>('login', {
       'audience': audience,
@@ -93,9 +93,9 @@ class Auth0Native {
     ///
     /// Else, it will clear the stored universal login session. This may prompt a
     /// web view to popup briefly.
-    bool localOnly,
-    String audience,
-    String scheme,
+    bool? localOnly,
+    String? audience,
+    String? scheme,
   }) async {
     await _methodChannel.invokeMethod<void>('logout', {
       'localOnly': localOnly,
@@ -110,7 +110,7 @@ class Auth0Native {
   Future<void> passwordlessWithSMS(
     String phone,
     PasswordlessType type, {
-    String connection,
+    String? connection,
   }) async {
     await _methodChannel.invokeMethod<void>('passwordlessWithSMS', {
       'phone': phone,
@@ -120,14 +120,14 @@ class Auth0Native {
   }
 
   /// Logs in the user by phone & OTP as created in [passwordlessWithSMS].
-  Future<Map<String, dynamic>> loginWithPhoneNumber(
+  Future<Map<String, dynamic>?> loginWithPhoneNumber(
     String phone,
     String code, {
-    String connection,
-    String audience,
-    String scope,
-    String device,
-    Map<String, dynamic> parameters,
+    String? connection,
+    String? audience,
+    String? scope,
+    String? device,
+    Map<String, dynamic>? parameters,
   }) async {
     return await _methodChannel
         .invokeMapMethod<String, dynamic>('loginWithPhoneNumber', {
@@ -147,7 +147,7 @@ class Auth0Native {
   Future<void> passwordlessWithEmail(
     String email,
     PasswordlessType type, {
-    String connection,
+    String? connection,
   }) async {
     await _methodChannel.invokeMethod<void>('passwordlessWithEmail', {
       'email': email,
@@ -157,14 +157,14 @@ class Auth0Native {
   }
 
   /// Logs in the user by email & OTP as created in [passwordlessWithEmail].
-  Future<Map<String, dynamic>> loginWithEmail(
+  Future<Map<String, dynamic>?> loginWithEmail(
     String email,
     String code, {
-    String connection,
-    String audience,
-    String scope,
-    String device,
-    Map<String, dynamic> parameters,
+    String? connection,
+    String? audience,
+    String? scope,
+    String? device,
+    Map<String, dynamic>? parameters,
   }) async {
     return await _methodChannel
         .invokeMapMethod<String, dynamic>('loginWithEmail', {
@@ -178,14 +178,14 @@ class Auth0Native {
     });
   }
 
-  Future<Map<String, dynamic>> loginWithEmailAndPassword(
+  Future<Map<String, dynamic>?> loginWithEmailAndPassword(
     String email,
     String password, {
-    String connection,
-    String audience,
-    String scope,
-    String device,
-    Map<String, dynamic> parameters,
+    String? connection,
+    String? audience,
+    String? scope,
+    String? device,
+    Map<String, dynamic>? parameters,
   }) async {
     return await _methodChannel
         .invokeMapMethod<String, dynamic>('loginWithEmail', {
@@ -200,9 +200,9 @@ class Auth0Native {
   }
 
   /// Attempts a native login via Sign in With Apple. (iOS only).
-  Future<Map<String, dynamic>> signInWithApple({
-    String audience,
-    String scope,
+  Future<Map<String, dynamic>?> signInWithApple({
+    String? audience,
+    String? scope,
   }) async {
     return await _methodChannel
         .invokeMapMethod<String, dynamic>('signInWithApple', {
@@ -211,14 +211,14 @@ class Auth0Native {
     });
   }
 
-  Future<Map<String, dynamic>> signUpWithEmailAndPassword(
+  Future<Map<String, dynamic>?> signUpWithEmailAndPassword(
     String email,
     String password, {
-    String connection,
-    String audience,
-    String scope,
-    String device,
-    Map<String, dynamic> parameters,
+    String? connection,
+    String? audience,
+    String? scope,
+    String? device,
+    Map<String, dynamic>? parameters,
   }) async {
     return await _methodChannel
         .invokeMapMethod<String, dynamic>('signUpWithEmailAndPassword', {
